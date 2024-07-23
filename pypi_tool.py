@@ -1,6 +1,6 @@
 import pkg_resources
 import csv
-import pkg_resources
+
 
 def list_package_dependencies(package_name, output_file):
     """
