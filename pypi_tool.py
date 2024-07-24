@@ -62,3 +62,30 @@ def check_packages_and_write_to_csv(input_file, output_csv):
 input_file = 'dependencies.txt'  # The input file from the previous step
 output_csv = 'package_versions.csv'  # The output CSV file
 check_packages_and_write_to_csv(input_file, output_csv)
+
+import requests
+
+def get_package_dependencies(package_name, output_file):
+    """Get the dependencies of a package from PyPI and write them to a file."""
+    url = f"https://pypi.org/pypi/{package_name}/json"
+    response = requests.get(url)
+    
+    with open(output_file, "w") as file:
+        if response.status_code == 200:
+            data = response.json()
+            # Extract the latest version
+            latest_version = data['info']['version']
+            # Extract dependencies for the latest version
+            dependencies = data['releases'][latest_version][0]['requires_dist']
+            
+            if dependencies:
+                file.write(f"Dependencies for {package_name} (version {latest_version}):\n")
+                for dep in dependencies:
+                    file.write(f"- {dep}\n")
+            else:
+                file.write(f"No dependencies found for {package_name} (version {latest_version}).\n")
+        else:
+            file.write(f"Failed to fetch data for package '{package_name}'. Status code: {response.status_code}\n")
+
+# Example usage
+get_package_dependencies("requests", "dependencies.txt")
